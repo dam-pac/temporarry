@@ -1,0 +1,52 @@
+# Preseed для установки Ubuntu автоматически 
+
+d-i debian-installer/locale string en_US
+d-i console-setup/layoutcode string us
+
+# Устанавливаем метку для автоматического форматирования диска
+d-i partman-auto/disk string /dev/sda
+d-i partman-auto/method string regular
+d-i partman-auto-lvm/new_vg_name string system
+d-i partman-auto-choose_recipe select atomic
+
+# Создаем новые разделы: /boot и /
+d-i partman-auto/expert_recipe string      \
+  boot-root ::                    \
+          40 50 100 ext4                \
+                  $primary{ } $bootable{ } \
+                  method{ format }    \
+          format{ }                  \
+          use_filesystem{ }           \
+          filesystem{ ext4 }         \
+          mountpoint{ /boot }          \
+  .               \
+          500 10000 -1 ext4            \
+                  method{ format }    \
+          format{ }                  \
+          use_filesystem{ }           \
+          filesystem{ ext4 }          \
+          mountpoint{ / }              
+
+# Устанавливаем и настраиваем GRUB 
+d-i grub-installer/bootdev  string (hd0)
+d-i grub-installer/only_debian boolean true
+
+# Настройки сети через DHCP
+d-i netcfg/choose_interface select auto
+d-i netcfg/get_hostname string unassigned-hostname
+d-i netcfg/get_domain string unassigned-domain
+d-i netcfg/get_ipaddress string
+d-i netcfg/get_netmask string
+d-i netcfg/get_gateway string
+d-i netcfg/get_nameservers string
+d-i netcfg/get_domain string localdomain
+d-i netcfg/confirm_static boolean true
+d-i netcfg/disable_dhcp boolean false
+
+# Установка пакетов python3, pip3, nano и т.д.
+d-i pkgsel/include string python3 pip3 nano
+
+# Выполнение post-installation скрипта
+d-i preseed/late_command string \
+in-target apt-get update; \
+in-target apt-get -y install python3 pip3 nano
