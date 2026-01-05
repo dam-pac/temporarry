@@ -1,0 +1,58 @@
+logLevel: info
+logDestinations: [stdout]
+
+# Включаем только нужные протоколы
+rtsp: yes
+rtmp: yes
+hls: no
+webrtc: no
+srt: no
+
+# Отключаем неиспользуемые сервисы
+api: no
+metrics: no
+pprof: no
+playback: no
+
+# RTMP сервер (прием от камер)
+rtmp: yes
+rtmpAddress: :1935
+rtmpEncryption: "no"
+
+# RTSP сервер (отдача в ZoneMinder)
+rtsp: yes
+rtspTransports: [tcp]  # TCP для надежности через сеть
+rtspEncryption: "no"
+rtspAddress: :8554
+rtspAuthMethods: [basic]
+
+# UDP для RTP/RTCP (опционально, если нужен UDP)
+rtpAddress: :8000
+rtcpAddress: :8001
+
+# Настройки путей (путей)
+paths:
+  # Основной путь для камеры - можно изменить на нужное имя
+  cam1:
+    source: publisher
+    # Настройки для записи (опционально)
+    record: no
+    # Разрешаем переподключение публикующего
+    overridePublisher: yes
+    
+  # Захватываем все остальные пути для будущих камер
+  all_others:
+    source: publisher
+    overridePublisher: yes
+
+# Настройки по умолчанию для всех путей
+pathDefaults:
+  source: publisher
+  maxReaders: 10  # Максимальное число читателей (клиентов)
+  overridePublisher: yes
+  
+  # Если хотите добавить запись на диск
+  record: no
+  # recordPath: ./recordings/%path/%Y-%m-%d_%H-%M-%S-%f
+  # recordFormat: fmp4
+  # recordDeleteAfter: 24h
